@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transfer Sample</title>
+    <script type="text/javascript" src="../bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="../bower_components/web3/dist/web3.js"></script>
+</head>
+<body>
+<h2>Contract</h2>
+<div>
+    <h3>Create</h3>
+    <button id="btnCreate">Create</button>
+    <h3>At</h3>
+    <input type="text" id="_contractAddress" size="20"/><button id="btnAt">At</button>
+
+    <h3>New Campaign</h3>
+    Beneficiery : <input type="text" id="_beneficiery" size="40"/><br/>
+    Goal (ether): <input type="text" id="_goal" size="20"/><br/>
+    <button id="btnNewCampaign">New Campaign</button>
+
+    <h3>Contribute</h3>
+    Campaign ID : <input type="text" id="_contributeCampaignId" size="5"/><br/>
+    Amount (ether) : <input type="text" id="_contributeEther" size="20"/><br/>
+    <button id="btnContribute">Contribute</button>
+
+    <h3>Goal Reached Check</h3>
+    Campaign ID : <input type="text" id="_checkCampaignId" size="5"/><br/>
+    Is Reached : <input type="text" id="_checkResult" size="5" readonly/><br/>
+    <button id="btnCheck">Check(call)</button><button id="btnCheck_Tx">Check(send)</button>
+</div>
+
+<script type="text/javascript">
+// web3 Initialization (Set web3 Provider)
+var Web3 = require('web3');
+//var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+var code = "60606040526102fc806100126000396000f360606040526000357c0100000000000000000000000000000000000000000000000000000000900480635b2329d41461004f578063c1cbbca71461007d578063f7572cf3146100955761004d565b005b61006560048080359060200190919050506100ca565b60405180821515815260200191505060405180910390f35b6100936004808035906020019091905050610182565b005b6100b46004808035906020019091908035906020019091905050610241565b6040518082815260200191505060405180910390f35b60006000600160005060008481526020019081526020016000206000509050806001016000505481600301600050541015610108576000915061017c565b8060000160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1660008260030160005054604051809050600060405180830381858888f1935050505050600081600301600050819055506001915061017c565b50919050565b600060016000506000838152602001908152602001600020600050905060406040519081016040528033815260200134815260200150816004016000506000836002016000818150548092919060010191905055815260200190815260200160002060005060008201518160000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908302179055506020820151816001016000505590505034816003016000828282505401925050819055505b5050565b600060006000818150548092919060010191905055905080506080604051908101604052808481526020018381526020016000815260200160008152602001506001600050600083815260200190815260200160002060005060008201518160000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908302179055506020820151816001016000505560408201518160020160005055606082015181600301600050559050505b9291505056";
+var abi = [{"constant":false,"inputs":[{"name":"campaignID","type":"uint256"}],"name":"checkGoalReached","outputs":[{"name":"reached","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"campaignID","type":"uint256"}],"name":"contribute","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"beneficiary","type":"address"},{"name":"goal","type":"uint256"}],"name":"newCampaign","outputs":[{"name":"campaignID","type":"uint256"}],"type":"function"}];
+var Contract = web3.eth.contract(abi);
+var crowd = null;
+$(document).ready(function() {
+    // Unlock First Account
+    //web3.personal.unlockAccount(web3.eth.accounts[0],'1111');
+    console.log("UNLOCKED");
+    $('#btnCreate').click(function(){
+            crowd = Contract.new({
+            data:code,
+            gas:2000000,
+            from:web3.eth.accounts[0]
+        }, function (error, contract) {
+            if (!error) {
+                if (!contract.address) {
+                    console.log("Creating Contract", contract.transactionHash);
+                } else {
+                    address = contract.address;
+                    console.log("Contract Deployed", contract.address);
+                }
+            } else
+                console.error(error);
+        });
+    });
+    $('#btnAt').click(function(){
+        var address = $('#_contractAddress').val();
+        crowd = Contract.at(address);
+    });
+    $('#btnNewCampaign').click(function(){
+    });
+    $('#btnContribute').click(function(){
+    });
+    $('#btnCheck').click(function(){
+    });
+    $('#btnCheck_Tx').click(function(){
+    });
+});
+</script>
+</body>
+</html>
